@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>生肖投注计算器 · 最终修正版</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 12px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            padding: 20px 16px;
+        }
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+        h1 small {
+            font-size: 0.8rem;
+            font-weight: normal;
+            color: #64748b;
+        }
+        .desc {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        textarea {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-family: monospace;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            resize: vertical;
+            background: #fcfcfd;
+            min-height: 200px;
+        }
+        .example {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 12px 0;
+        }
+        .example span {
+            background: #eef2f6;
+            padding: 4px 12px;
+            border-radius: 24px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        button {
+            flex: 1;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        button.reset {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+        .result {
+            margin-top: 20px;
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 16px;
+        }
+        .total-bet {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: right;
+            border-bottom: 1px dashed #cbd5e1;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        .back-list {
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .back-item {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 6px 10px;
+            border-radius: 32px;
+            margin: 4px 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .footer {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .detail-link {
+            text-align: right;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+        .detail-link a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🐉 生肖投注计算器 <small>最终修正 · 110元通过</small></h1>
+    <div class="desc">
+        <strong>📌 规则：</strong><br>
+        • 每段以包含"各"的行结束，"各"前面的部分（如有）属于该段。<br>
+        • 混合行（生肖+数字）：取生肖的默认号码 + 行内指定数字（去重），每个号码一注。<br>
+        • 纯数字行：每个数字一注。<br>
+        • 纯生肖行：每个生肖的默认号码各一注。<br>
+        • 支持分隔符：空格、小数点、逗号、顿号、连字符、分号等。<br>
+        <strong>默认号码：</strong> 马1,13,25,37,49；其它生肖4码。
+    </div>
+    <textarea id="inputArea" placeholder="请在此输入投注内容，支持多段"各金额""></textarea>
+    <div class="example">
+        <span onclick="fillExample('1各10\n\n6.3.5各10\n\n龙04.09-5\n各10')">测试110</span>
+        <span onclick="fillExample('12  14  20  24  48 各 20\n48各100\n鼠虎兔马猴狗\n10,11,12,13,14,15,16,17,18,19,30,31,32,33,34,35,36,37,38,39\n30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49\n各40\n30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49\n各20')">测试3200</span>
+    </div>
+    <div class="actions">
+        <button onclick="calculate()">📊 计算总投注 & 回本号码</button>
+        <button class="reset" onclick="resetInput()">🗑️ 清空</button>
+    </div>
+    <div id="resultPanel" class="result" style="display:none;">
+        <div class="total-bet" id="totalBetSpan"></div>
+        <div id="backNumbersDiv" style="font-weight:bold; margin-bottom:8px;">✅ 回本号码（47倍）：</div>
+        <div class="back-list" id="backList"></div>
+        <div class="detail-link"><a href=" " onclick="showAllDetails(); return false;">📋 查看每个号码的投注额</a ></div>
+        <div id="allDetails" style="display:none; margin-top:12px; max-height:200px; overflow-y:auto; background:#fff; border-radius:12px; padding:8px;"></div>
+    </div>
+    <div class="footer">* 赔率固定47倍。回本条件：该号码投注额 ≥ 总投注 ÷ 47。</div>
+</div>
+
+<script>
+    const DEFAULT_MAP = {
+        '鼠': [7,19,31,43], '牛': [6,18,30,42], '虎': [5,17,29,41],
+        '兔': [4,16,28,40], '龙': [3,15,27,39], '龍': [3,15,27,39],
+        '蛇': [2,14,26,38], '马': [1,13,25,37,49], '馬': [1,13,25,37,49],
+        '羊': [12,24,36,48], '猴': [11,23,35,47], '鸡': [10,22,34,46],
+        '雞': [10,22,34,46], '狗': [9,21,33,45], '猪': [8,20,32,44], '豬': [8,20,32,44]
+    };
+    const ANIMAL_REGEX = /[鼠牛虎兔龙龍蛇马馬羊猴鸡雞狗猪豬]/g;
+
+    // 提取数字：支持空格、小数点、逗号、顿号、连字符、分号等
+    function extractNumbers(str) {
+        let s = str.replace(/[^0-9\.\-]+/g, ' '); // 保留数字、小数点、连字符
+        let parts = s.split(/[\s\.\-]+/);
+        let nums = [];
+        for (let p of parts) {
+            if (/^\d+$/.test(p)) nums.push(parseInt(p,10));
+        }
+        return nums;
+    }
+
+    // 判断行类型（修正：先检查是否包含生肖，再检查数字）
+    function getLineType(line) {
+        const hasAnimal = ANIMAL_REGEX.test(line);
+        const hasDigit = /\d/.test(line);
+        if (hasAnimal && !hasDigit) return 'animal';
+        if (!hasAnimal && hasDigit) return 'number';
+        if (hasAnimal && hasDigit) return 'mixed';
+        return 'empty';
+    }
+
+    function parseSegment(lines, amount) {
+        let bets = [];
+        for (let line of lines) {
+            const type = getLineType(line);
+            if (type === 'animal') {
+                let animals = line.match(ANIMAL_REGEX);
+                for (let a of animals) {
+                    let nums = DEFAULT_MAP[a];
+                    if (nums) for (let n of nums) bets.push({ amount, numbers: [n] });
+                }
+            } else if (type === 'number') {
+                let nums = extractNumbers(line);
+                for (let n of nums) bets.push({ amount, numbers: [n] });
+            } else if (type === 'mixed') {
+                // 提取所有生肖的默认号码
+                let allNumbers = new Set();
+                let animals = line.match(ANIMAL_REGEX);
+                for (let a of animals) {
+                    let defNums = DEFAULT_MAP[a];
+                    if (defNums) defNums.forEach(n => allNumbers.add(n));
+                }
+                // 提取行中所有数字（生肖后面的数字）
+                let remaining = line;
+                let match;
+                while ((match = ANIMAL_REGEX.exec(remaining)) !== null) {
+                    let start = match.index + match[0].length;
+                    let nextMatch = ANIMAL_REGEX.exec(remaining);
+                    let end = nextMatch ? nextMatch.index : remaining.length;
+                    let numPart = remaining.substring(start, end);
+                    let nums = extractNumbers(numPart);
+                    for (let n of nums) allNumbers.add(n);
+                    ANIMAL_REGEX.lastIndex = start;
+                }
+                ANIMAL_REGEX.lastIndex = 0;
+                for (let n of allNumbers) {
+                    if (n>=1 && n<=49) bets.push({ amount, numbers: [n] });
+                }
+            }
+        }
+        return bets;
+    }
+
+    function parseFullText(text) {
+        let lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+        let allBets = [];
+        let currentLines = [];
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            let geIdx = line.indexOf('各');
+            if (geIdx !== -1) {
+                let amountMatch = line.match(/各\s*(\d+(?:\.\d+)?)/);
+                if (amountMatch) {
+                    let amount = parseFloat(amountMatch[1]);
+                    let beforeGe = line.substring(0, geIdx).trim();
+                    if (beforeGe.length > 0) {
+                        currentLines.push(beforeGe);
+                    }
+                    if (currentLines.length > 0) {
+                        let bets = parseSegment(currentLines, amount);
+                        allBets.push(...bets);
+                    }
+                    currentLines = [];
+                } else {
+                    // 无效的"各"行，但为了鲁棒，将整行作为纯数字行处理？跳过
+                }
+            } else {
+                currentLines.push(line);
+            }
+        }
+        return allBets;
+    }
+
+    function aggregate(bets) {
+        let totalMap = new Array(50).fill(0);
+        let totalAmount = 0;
+        for (let bet of bets) {
+            let amt = bet.amount;
+            let nums = bet.numbers;
+            for (let n of nums) {
+                if (n>=1 && n<=49) {
+                    totalMap[n] += amt;
+                    totalAmount += amt;
+                }
+            }
+        }
+        return { totalMap, totalAmount };
+    }
+
+    function calculate() {
+        let inputText = document.getElementById('inputArea').value.trim();
+        if (!inputText) { alert("请输入内容"); return; }
+        let bets = parseFullText(inputText);
+        if (bets.length === 0) { alert("未解析到任何投注，请检查格式"); return; }
+        let { totalMap, totalAmount } = aggregate(bets);
+        let threshold = totalAmount / 47;
+        let backNumbers = [];
+        for (let i=1; i<=49; i++) if (totalMap[i] >= threshold) backNumbers.push(i);
+        backNumbers.sort((a,b)=>a-b);
+        let panel = document.getElementById('resultPanel');
+        panel.style.display = 'block';
+        document.getElementById('totalBetSpan').innerHTML = `总投注：${totalAmount.toFixed(2)} 元  | 回本门槛：≥ ${threshold.toFixed(2)} 元`;
+        let html = '';
+        for (let num of backNumbers) html += `<span class="back-item">${num.toString().padStart(2,'0')} (${totalMap[num]}元)</span>`;
+        if (backNumbers.length === 0) html = '<span>无回本号码</span>';
+        document.getElementById('backList').innerHTML = html;
+        window.allDetailsMap = totalMap;
+        window.allDetailsThreshold = threshold;
+        document.getElementById('allDetails').style.display = 'none';
+    }
+
+    function showAllDetails() {
+        let map = window.allDetailsMap;
+        if (!map) return;
+        let th = window.allDetailsThreshold;
+        let html = '<div style="font-size:0.85rem;"><strong>每个号码投注额</strong><br>';
+        for (let i=1; i<=49; i++) {
+            let val = map[i];
+            let mark = (val >= th) ? '✅' : '❌';
+            html += `<span style="display:inline-block; width:70px;">${i.toString().padStart(2,'0')}: ${val}元 ${mark}</span>`;
+            if (i%7===0) html += '<br>';
+        }
+        html += '</div>';
+        let detailsDiv = document.getElementById('allDetails');
+        detailsDiv.innerHTML = html;
+        detailsDiv.style.display = 'block';
+    }
+
+    function resetInput() { document.getElementById('inputArea').value = ''; document.getElementById('resultPanel').style.display = 'none'; }
+    function fillExample(txt) { document.getElementById('inputArea').value = txt; calculate(); }
+</script>
+</body>
+</html>
