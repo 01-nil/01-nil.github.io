@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>漳州环境集团 · 仓库管理办法流程图</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f6fa;
+            color: #2d3436;
+            padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+            color: #1a3c6e;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #636e72;
+            margin-bottom: 30px;
+        }
+        .chart-block {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 24px 20px;
+            margin-bottom: 24px;
+        }
+        .chart-block h2 {
+            font-size: 1.15rem;
+            color: #1a3c6e;
+            border-left: 4px solid #3b82f6;
+            padding-left: 12px;
+            margin-bottom: 18px;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #b2bec3;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>仓库管理办法流程图</h1>
+    <p class="subtitle">漳州环境集团 · 依据《管理办法（试行）》编制</p>
+
+    <!-- 一、采购入库总流程 -->
+    <div class="chart-block">
+        <h2>一、采购入库总流程（第三、四章）</h2>
+        <div class="mermaid">
+flowchart TD
+    A["仓库管理员制定采购计划"] --> B{"物资类型"}
+    B -->|"常规物资"| C["根据日消耗量、设备型号\n增减库存"]
+    B -->|"非常规/备件"| D["班组长上报需求\n填写《配件采购申请单》（附件1）"]
+    C --> E["仓库管理员核对\n名称/型号/数量"]
+    D --> E
+    E --> F{"金额判断"}
+    F -->|"≤1000元"| G["直接报送采购员"]
+    F -->|"1000~3000元"| H["班组长签字审批"]
+    F -->|"＞3000元"| I["部门负责人签字审批"]
+    H --> G
+    I --> G
+    G --> J["采购员按《物资采购管理实施细则》\n询价、报批、购买"]
+    J --> K["供应商发货/到货"]
+    K --> L["仓库管理员清点验收\n品种/数量/质量"]
+    L --> M{"检验结果"}
+    M -->|"合格"| N["签字确认到货清单\n上架入库"]
+    M -->|"破损/不符"| O["向供应商/运输公司索赔\n分区管理"]
+    N --> P["系统录入：核对供应商/编码/\n名称/数量/金额/单价"]
+    P --> Q["原始到货清单扫描留档\n分类存放、标识清楚"]
+    Q --> R(("入库完成"))
+    O --> R
+        </div>
+    </div>
+
+    <!-- 二、出库领用流程 -->
+    <div class="chart-block">
+        <h2>二、出库领用流程（第五章）</h2>
+        <div class="mermaid">
+flowchart TD
+    A["领料人提交\n《仓库物资申领单》（附件2）"] --> B{"金额判断"}
+    B -->|"≤1000元"| C["申领单审批完整"]
+    B -->|"1000~3000元"| D["填写《贵重零配件与物资领用审批表》\n（附件3）+ 班组长签字"]
+    B -->|"＞3000元"| E["填写附件3 + 部门负责人签字"]
+    D --> C
+    E --> C
+    C --> F["仓库管理员核对：\n设备编号/型号/名称/数量"]
+    F --> G{"签字是否完整"}
+    G -->|"完整"| H["领料人二次检验\n配件完好性"]
+    G -->|"不完整"| I["拒绝发货"]
+    H --> J{"领料人签字确认"}
+    J -->|"签字"| K["发放出库\n系统出库：三方一致"]
+    J -->|"不签字"| I
+    K --> L["特殊情况：班组长代签\n每周五检查未签字情况\n上报仓库管理部门"]
+    L --> M(("出库完成"))
+        </div>
+    </div>
+
+    <!-- 三、借料管理流程 -->
+    <div class="chart-block">
+        <h2>三、借料管理流程（第五章 第十七条）</h2>
+        <div class="mermaid">
+flowchart TD
+    A["班组需要借用配件/物料"] --> B["填写《临时借料单》\n（附件4）+ 班组长签字"]
+    B --> C{"借料价值判断"}
+    C -->|"≤1000元"| D["直接发料出借"]
+    C -->|"＞1000元"| E["填写《贵重零配件与物资\n借用审批表》（附件5）\n分管领导审批"]
+    E --> D
+    D --> F{"借料时长"}
+    F -->|"当天归还"| G["仓库管理员检查完好性\n借料人签字确认归还\n做好归还记录"]
+    F -->|"当天无法归还"| H["上报分管领导\n确认归还日期"]
+    H --> I["到期归还时\n检查完好性 → 签字归还"]
+    F -->|"逾期未归还"| J["仓库管理员上报\n仓库管理部门"]
+    G --> K(("借料流程结束"))
+    I --> K
+    J --> K
+        </div>
+    </div>
+
+    <!-- 四、配件退回流程 -->
+    <div class="chart-block">
+        <h2>四、配件退回流程（第五章 第十九条）</h2>
+        <div class="mermaid">
+flowchart TD
+    A["维修工/机务员判断失误\n或维修剩余未用配件"] --> B["清点核对\n确保配件无损可再次使用"]
+    B --> C{"退回时间"}
+    C -->|"当月（25-30日退件窗口期）"| D["当月内送至仓库\n办理退件"]
+    C -->|"跨月"| E["班组长与仓库负责人沟通\n采用次月红冲入库退件"]
+    D --> F["仓库管理员清点验收\n办理退库手续"]
+    E --> F
+    F --> G(("退件完成"))
+        </div>
+    </div>
+
+    <!-- 五、调拨出库流程 -->
+    <div class="chart-block">
+        <h2>五、调拨出库流程（第六章）</h2>
+        <div class="mermaid">
+flowchart TD
+    A["发起调拨"] --> B["填写调拨单\n双方仓库管理员签字"]
+    B --> C["调出方：按出库流程办理"]
+    B --> D["调入方：收到调拨单和物料\n按入库程序及时入库"]
+    C --> E["保证双方当月\n调出与调入数据一致"]
+    D --> E
+    E --> F(("调拨完成"))
+        </div>
+    </div>
+
+    <!-- 六、库存盘点流程 -->
+    <div class="chart-block">
+        <h2>六、库存盘点流程（第七章）</h2>
+        <div class="mermaid">
+flowchart TD
+    A["盘点类型"] --> B["不定期动态清点\n（当日有出入库的物料）"]
+    A --> C["每月末抽查盘点\n（财务 + 仓库管理部门）"]
+    A --> D["每年终总盘点\n（财务 + 仓库管理部门）"]
+    B --> E["做好清点记录\n发现问题查找原因\n上报仓库负责人"]
+    C --> F["盘点内容：\n库存种类/数量/位置码\n是否与系统账目一致"]
+    D --> F
+    F --> G["核实：借料单是否清理\n涨库是否入库\n摆放是否合理\n物料是否损坏"]
+    G --> H{"账物是否相符"}
+    H -->|"相符"| I["盘点通过"]
+    H -->|"不符"| J["上报集团财务管理部门\n落实责任人\n按规扣罚绩效工资"]
+    I --> K(("盘点完成"))
+    J --> K
+        </div>
+    </div>
+
+    <!-- 七、仓库日常与安全管理 -->
+    <div class="chart-block">
+        <h2>七、仓库日常与安全管理要点（第八、九章）</h2>
+        <div class="mermaid">
+flowchart LR
+    subgraph 日常管理
+        A1["先入后出原则"] --> A2["六防：防锈/防腐/\n防潮/防冻/防热/防混"]
+        A2 --> A3["摆放六原则：\n重物下置/按周转速度/\n按类型/一货位一编码/\n按到货日期/呆滞物料管理"]
+        A3 --> A4["呆滞物料：\n分区建台账/盘点核对/\n避免重复采购"]
+    end
+    subgraph 安全管理
+        B1["未经允许不得进入仓库"] --> B2["机油等危险品远离电源\n保持通风"]
+        B2 --> B3["禁止私拉乱接电线\n禁止使用电热器/白炽灯"]
+        B3 --> B4["禁火标志/禁烟禁明火\n通道畅通/消防器材到位"]
+        B4 --> B5["火情处理：\n切断电源→灭火→撤离→\n上报→火势大报119"]
+    end
+        </div>
+    </div>
+
+    <p class="footer">依据《管理办法（试行）》整理 · 漳州环境集团</p>
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default', flowchart: { useMaxWidth: true, htmlLabels: true } });
+</script>
+</body>
+</html>
